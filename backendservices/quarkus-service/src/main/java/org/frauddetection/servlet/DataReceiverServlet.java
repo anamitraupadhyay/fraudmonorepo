@@ -1,17 +1,16 @@
 package org.frauddetection.servlet;
 
-import org.frauddetection.model.FormData;
+import org.frauddetection.service.FraudDetectionHandler;
+import org.json.JSONObject;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
 
-/**
- * Servlet that receives form data and forwards it for processing
- */
 @WebServlet("/data-handler")
 public class DataReceiverServlet extends HttpServlet {
 
@@ -19,22 +18,34 @@ public class DataReceiverServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Create a FormData object from request parameters to store the data in variables
-        FormData formData = new FormData(
-                request.getParameter("field1"),
-                request.getParameter("field2"),
-                request.getParameter("field3"),
-                request.getParameter("field4"),
-                request.getParameter("field5"),
-                request.getParameter("field6"),
-                request.getParameter("field7"),
-                request.getParameter("field8"),
-                request.getParameter("field9"));
+        // Step 1: Read JSON data from request body
+        StringBuilder jsonPayload = new StringBuilder();
+        try (BufferedReader reader = request.getReader()) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                jsonPayload.append(line);
+            }
+        }
 
-        // Store the data object as a request attribute
-        request.setAttribute("formData", formData);
+        // Step 2: Parse JSON data and process
+        try {
+            JSONObject requestData = new JSONObject(jsonPayload.toString());
 
-        // Forward to the processing servlet
-        request.getRequestDispatcher("/process-data").forward(request, response);
+            // Step 3: Process the transaction using FraudDetectionHandler
+            FraudDetectionHandler handler = new FraudDetectionHandler();
+            JSONObject result = handler.processTransaction(requestData);
+
+            // Step 4: Send the result back to the client
+            response.setContentType("application/json");
+            response.getWriter().write(result.toString());
+
+        } catch (Exception e) {
+            // Step 5: Handle errors
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            JSONObject errorResponse = new JSONObject();
+            errorResponse.put("error", "Invalid input data: " + e.getMessage());
+            response.setContentType("application/json");
+            response.getWriter().write(errorResponse.toString());
+        }
     }
 }

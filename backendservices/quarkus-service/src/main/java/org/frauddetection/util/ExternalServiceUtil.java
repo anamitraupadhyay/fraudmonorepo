@@ -1,0 +1,55 @@
+package org.frauddetection.util;
+
+import org.json.JSONObject;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
+
+public class ExternalServiceUtil {
+
+    /**
+     * Call the Python ML model service
+     * 
+     * @param requestData JSON data to be sent to the model
+     * @return The model's prediction as a JSONObject
+     */
+    public static JSONObject callPythonModel(JSONObject requestData) throws IOException {
+        System.out.println("Sending request to ML service: " + requestData.toString());
+        try {
+            URL url = URI.create("http://127.0.0.1:5000/predict").toURL();
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setDoOutput(true);
+            conn.setConnectTimeout(3000); // 3 second timeout
+
+            // Send the JSON payload
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(requestData.toString().getBytes());
+            }
+
+            // Read the FULL response (not just one line)
+            StringBuilder responseBuilder = new StringBuilder();
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    responseBuilder.append(line);
+                }
+                String fullResponse = responseBuilder.toString();
+                System.out.println("ML service full response: " + fullResponse);
+                return new JSONObject(fullResponse);
+            }
+        } catch (IOException e) {
+            System.err.println("ML service error: " + e.getMessage());
+            e.printStackTrace(); // Add this for more detailed error info
+            JSONObject errorResponse = new JSONObject();
+            errorResponse.put("prediction", 0); // Default to non-fraud if service is down
+            errorResponse.put("reason", "ML service unavailable - using safe default");
+            return errorResponse;
+        }
+    }
+}
