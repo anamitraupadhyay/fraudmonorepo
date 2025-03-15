@@ -6,9 +6,9 @@ import org.json.JSONObject;
 
 public class DataBaseTestCases {
     // DB configuration
-    public static final String DB_URL = "jdbc:mariadb://localhost:3306/fraud_detection";
+    public static final String DB_URL = "jdbc:mariadb://localhost:3307/fraud_detection";
     public static final String DB_USER = "fraud_user";
-    public static final String DB_PASSWORD = "fraud_pass"; // Update with actual password
+    public static final String DB_PASSWORD = "fraud_pass";
 
     // Load MariaDB JDBC Driver
     static {
@@ -25,7 +25,7 @@ public class DataBaseTestCases {
         Statement stmt = null;
         try {
             // Connect to MySQL without specifying a database
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306?useSSL=false", DB_USER, DB_PASSWORD);
+            conn = DriverManager.getConnection(DB_URL+"?useSSL=false", DB_USER, DB_PASSWORD);
             stmt = conn.createStatement();
             // Create database if it doesn’t exist
             stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS fraud_detection");
