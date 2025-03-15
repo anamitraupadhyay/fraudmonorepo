@@ -1,7 +1,7 @@
 // Import necessary modules
 import { getCoordinates } from './geocoding.js';
 
-function fraudForm() {
+window.fraudForm = function() {
     return {
         async submitForm(event) {
             event.preventDefault();
@@ -52,4 +52,4 @@ function fraudForm() {
             }
         }
     };
-}
+};

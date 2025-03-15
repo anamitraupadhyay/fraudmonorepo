@@ -1,5 +1,5 @@
 // Geocoding API key (replace with your own key)
-const API_KEY = 'YOUR_API_KEY';
+const API_KEY = '070599de3b634054b32f7d632a8f8220';
 
 // Function to get coordinates from location name
 export async function getCoordinates(location) {
