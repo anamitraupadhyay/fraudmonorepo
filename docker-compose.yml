@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  quarkus-service:
+    image: quarkus-service:latest
+    build:
+      context: ./backendservices/quarkus-service
+    ports:
+      - "8080:8080"
+    networks:
+      - fraud-network
+
+  frontend:
+    image: fraud-frontend:latest
+    build:
+      context: ./frontendservices
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - fraud-network
+    depends_on:
+      - quarkus-service
+
+networks:
+  fraud-network:
+    driver: bridge

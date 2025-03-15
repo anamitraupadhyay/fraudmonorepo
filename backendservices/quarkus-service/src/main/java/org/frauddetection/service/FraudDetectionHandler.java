@@ -2,6 +2,8 @@ package org.frauddetection.service;
 
 import org.json.JSONObject;
 
+import jakarta.enterprise.context.ApplicationScoped;
+
 import org.frauddetection.db.DataBaseTestCases;
 import org.frauddetection.model.TransactionData;
 import org.frauddetection.util.FraudDetectionUtils;
@@ -10,6 +12,7 @@ import org.frauddetection.util.ExternalServiceUtil;
 
 import java.io.IOException;
 
+@ApplicationScoped
 public class FraudDetectionHandler {
 
     // Distance threshold (in km) to decide whether to bypass the ML model
