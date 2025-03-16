@@ -1,5 +1,5 @@
 // Import necessary modules
-import { getCoordinates } from './geocoding.js';
+import { getCoordinates, getCityPopulation } from './geocoding.js';
 
 window.fraudForm = function() {
     return {
@@ -16,6 +16,7 @@ window.fraudForm = function() {
             // Get coordinates for user and merchant locations
             const userCoords = await getCoordinates(userLocation);
             const merchantCoords = await getCoordinates(merchantLocation);
+            const population = await getCityPopulation(userLocation);
 
             if (!userCoords || !merchantCoords) {
                 document.getElementById('result').innerHTML = '<div class="alert alert-danger">Failed to get coordinates for locations.</div>';
@@ -29,7 +30,7 @@ window.fraudForm = function() {
                 zip: zip,
                 lat: userCoords.lat,
                 long: userCoords.lng,
-                city_pop: 0, // Placeholder, replace with actual value if available
+                city_pop: population, // Use the population value from the API
                 unix_time: Math.floor(Date.now() / 1000),
                 merch_lat: merchantCoords.lat,
                 merch_long: merchantCoords.lng

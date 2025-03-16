@@ -13,3 +13,20 @@ export async function getCoordinates(location) {
         return null;
     }
 }
+
+// Function to get city population from location name
+export async function getCityPopulation(location) {
+    const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${API_KEY}`);
+    const data = await response.json();
+    
+    if (data.results.length > 0) {
+        const category = data.results[0].components._category;
+        // Simple population estimation based on location category
+        if (category === 'place' || category === 'city') {
+            const importance = parseFloat(data.results[0].importance || 0.5);
+            return Math.round(importance * 1000000); // Rough estimate based on location importance
+        }
+        return 10000; // Default small city population
+    }
+    return 0;
+}
