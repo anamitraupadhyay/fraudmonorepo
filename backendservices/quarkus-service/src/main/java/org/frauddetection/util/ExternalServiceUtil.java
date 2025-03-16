@@ -20,7 +20,7 @@ public class ExternalServiceUtil {
     public static JSONObject callPythonModel(JSONObject requestData) throws IOException {
         System.out.println("Sending request to ML service: " + requestData.toString());
         try {
-            URL url = URI.create("http://127.0.0.1:5000/predict").toURL();
+            URL url = URI.create("http://python-quarkus-service:5000/predict").toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json");

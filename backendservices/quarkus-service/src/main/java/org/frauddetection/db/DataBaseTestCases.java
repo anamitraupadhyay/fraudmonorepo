@@ -6,7 +6,7 @@ import org.json.JSONObject;
 
 public class DataBaseTestCases {
     // DB configuration
-    public static final String DB_URL = "jdbc:mariadb://localhost:3307/fraud_detection";
+    public static final String DB_URL = "jdbc:mariadb://mariadb:3306/fraud_detection";
     public static final String DB_USER = "fraud_user";
     public static final String DB_PASSWORD = "fraud_pass";
 

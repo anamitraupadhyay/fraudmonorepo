@@ -37,7 +37,9 @@ window.fraudForm = function() {
 
             // Send data to backend
             try {
-                const response = await fetch('http://localhost:8080/data-handler', {
+                // Detect environment - in production, use service name, otherwise use localhost
+                const host = window.location.hostname === 'localhost' ? 'localhost' : 'quarkus-service';
+                const response = await fetch(`http://${host}:8080/data-handler`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
