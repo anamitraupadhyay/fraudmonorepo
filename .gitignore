@@ -1,0 +1,40 @@
+# IDE specific files
+.idea/
+.idea
+.vscode/
+.vscode
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# Package files
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+release.properties
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# Local env files
+.env
+.env.local
+
+# System Files
+.DS_Store
+Thumbs.db
