@@ -4,8 +4,7 @@ import pandas as pd
 from flask import Flask, request, jsonify
 
 # Paths
-DATASET_DIR = os.path.join(os.path.expanduser("~"), "fraudmonorepo/backendservices/python-quarkus-service")
-MODEL_PATH = os.path.join(DATASET_DIR, "model.pkl")
+MODEL_PATH = "model.pkl"  # Look in the current directory
 
 # Loading the model
 if not os.path.exists(MODEL_PATH):
