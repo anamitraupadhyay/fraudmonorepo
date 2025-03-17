@@ -43,8 +43,7 @@ services:
     networks:
       - fraud-network
 
-  python-service:
-    build:
+  build:
       context: ./backendservices/python-service
     container_name: python-service
     ports:
@@ -67,3 +66,4 @@ networks:
 
 volumes:
   mariadb_data:
+
