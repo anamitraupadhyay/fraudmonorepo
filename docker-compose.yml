@@ -39,7 +39,7 @@ services:
       context: ./backendservices/python-quarkus-service
     container_name: python-quarkus-service
     ports:
-      - "5000:5000"
+      - "5005:5000"
     networks:
       - fraud-network
 
@@ -67,3 +67,4 @@ networks:
 
 volumes:
   mariadb_data:
+
