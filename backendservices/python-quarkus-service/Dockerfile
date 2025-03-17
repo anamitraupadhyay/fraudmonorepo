@@ -1,4 +1,4 @@
-FROM python:3.9-slim
+﻿FROM python:3.9-slim
 
 WORKDIR /app
 
@@ -11,11 +11,7 @@ COPY model_train.py .
 COPY app.py .
 COPY balanced_dataset.csv .
 
-# Add a startup script
-COPY start.sh .
-RUN chmod +x start.sh
-
 EXPOSE 5000
 
-# Use the startup script instead of directly running app.py
-CMD ["./start.sh"]
+# Train model and then run app
+CMD python model_train.py && python app.py

@@ -1,4 +1,4 @@
-#!/bin/bash
+﻿#!/bin/bash
 
 # Check if model exists, if not train it
 if [ ! -f "model.pkl" ]; then
