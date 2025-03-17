@@ -48,7 +48,7 @@ def analyze_text(text):
     # Using Ollama - a free, locally-hosted LLM solution
     try:
         response = ollama.generate(
-            model="mistral",  # You can use other models too
+            model="gemma3:4b",  # You can use other models too
             prompt=prompt,
             format="json"
         )
