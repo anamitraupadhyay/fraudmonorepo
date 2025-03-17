@@ -26,7 +26,7 @@ public class DataReceiverServlet extends HttpServlet {
                 jsonPayload.append(line);
             }
         }
-
+        // susbtitute this by JSON.parse as my ambition was json->object->json and in obj format the db and testcases will be done
         // Step 2: Parse JSON data and process
         try {
             JSONObject requestData = new JSONObject(jsonPayload.toString());
