@@ -1,56 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fraud Detection</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <script src="https://unpkg.com/htmx.org@1.6.1"></script>
-    <script src="https://unpkg.com/alpinejs@3.10.2" defer></script>
-    <script src="https://unpkg.com/es-module-shims@1.5.4/dist/es-module-shims.js"></script>
+    <!-- Import Lit from CDN -->
     <script type="importmap">
     {
       "imports": {
+        "lit": "https://cdn.jsdelivr.net/npm/lit@2.6.1/index.js",
         "./geocoding.js": "./geocoding.js"
       }
     }
     </script>
-    <script type="module" src="main.js"></script>
+    <script type="module" src="./main.js"></script>
 </head>
-
 <body>
-    <div class="container mt-5" x-data="fraudForm()">
+    <div class="container mt-5">
         <h1 class="text-center">Fraud Detection</h1>
-        <form id="fraudForm" @submit.prevent="submitForm">
-            <div class="form-group">
-                <label for="ccNum">Credit Card Number</label>
-                <input type="text" class="form-control" id="ccNum" name="cc_num" required>
-            </div>
-            <div class="form-group">
-                <label for="amt">Amount</label>
-                <input type="number" class="form-control" id="amt" name="amt" required>
-            </div>
-            <div class="form-group">
-                <label for="zip">ZIP Code</label>
-                <input type="text" class="form-control" id="zip" name="zip" required>
-            </div>
-            <div class="form-group">
-                <label for="userLocation">User Location</label>
-                <input type="text" class="form-control" id="userLocation" name="user_location" required>
-            </div>
-            <div class="form-group">
-                <label for="merchantLocation">Merchant Location</label>
-                <input type="text" class="form-control" id="merchantLocation" name="merchant_location" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-        <div id="result" class="mt-4"></div>
-        <div id="debug" style="background-color: #f8f9fa; padding: 10px; margin-top: 20px; border-radius: 5px;">
-            <h4>Debug Info</h4>
-            <div id="debugContent"></div>
-        </div>
+        <!-- Replace Alpine form with our web component -->
+        <fraud-detection-form></fraud-detection-form>
     </div>
 </body>
 </html>
