@@ -2,43 +2,54 @@ package org.frauddetection.service;
 
 import org.json.JSONObject;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import java.io.IOException;
+
 import org.frauddetection.db.DataBaseTestCases;
 import org.frauddetection.model.TransactionData;
 import org.frauddetection.util.FraudDetectionUtils;
 import org.frauddetection.util.ExternalServiceUtil;
-import java.io.IOException;
+
 
 @ApplicationScoped
 public class FraudDetectionHandler {
     // Single speed threshold (300 km/h - high-speed train)
     private static final double MAX_SPEED_KMH = 300.0;
 
+    @Inject
+    FraudDetectionHandler handler;
+
     /**
      * Process a transaction and check for fraud
      * @param requestData the transaction data
      * @return JSONObject with fraud prediction and reason
      */
-    public JSONObject processTransaction(JSONObject requestData) throws IOException {
+    private JSONObject convertToJson(TransactionData data) {
+        JSONObject json = new JSONObject();
+        json.put("cc_num", data.getCcNum());
+        json.put("amt", data.getAmt());
+        json.put("zip", data.getZip());
+        json.put("lat", data.getLat());
+        json.put("long", data.getLon());
+        json.put("city_pop", data.getCityPop());
+        json.put("unix_time", data.getUnixTime());
+        json.put("merch_lat", data.getMerchLat());
+        json.put("merch_long", data.getMerchLon());
+        return json;
+    }
+
+    public JSONObject processTransaction(TransactionData transactionData) throws IOException {
         // Extract transaction fields for test cases
-        long ccNum = requestData.getLong("cc_num");
-        double lat = requestData.getDouble("lat");
-        double lon = requestData.getDouble("long");
-        long unixTime = requestData.getLong("unix_time");
-        
-        // Create transaction data object for storage
-        TransactionData transactionData = new TransactionData(
-            ccNum, 
-            requestData.getDouble("amt"), 
-            requestData.getString("zip"), 
-            lat, lon, 
-            requestData.getInt("city_pop"), 
-            unixTime,
-            requestData.getDouble("merch_lat"), 
-            requestData.getDouble("merch_long")
-        );
+        long ccNum = transactionData.getCcNum();
+        double lat = transactionData.getLat();
+        double lon = transactionData.getLon();
+        long unixTime = transactionData.getUnixTime();
         
         // Prepare response
         JSONObject responseJson = new JSONObject();
+
+        // Convert transaction data to JSON for logging
+        JSONObject requestData = convertToJson(transactionData);
         
         // Get last transaction (if any)
         JSONObject lastTransaction = DataBaseTestCases.getLastTransaction(ccNum);

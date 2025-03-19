@@ -40,16 +40,22 @@ public class ExternalServiceUtil {
                     responseBuilder.append(line);
                 }
                 String fullResponse = responseBuilder.toString();
-                System.out.println("ML service full response: " + fullResponse);
+                //System.out.println("ML service full response: " + fullResponse); debug point
                 return new JSONObject(fullResponse);
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             System.err.println("ML service error: " + e.getMessage());
             e.printStackTrace(); // Add this for more detailed error info
             JSONObject errorResponse = new JSONObject();
             errorResponse.put("prediction", 0); // Default to non-fraud if service is down
             errorResponse.put("reason", "ML service unavailable - using safe default");
             return errorResponse;
+        }
+        finally {
+            if(conn != null){
+                conn.close();
+            }
         }
     }
 }

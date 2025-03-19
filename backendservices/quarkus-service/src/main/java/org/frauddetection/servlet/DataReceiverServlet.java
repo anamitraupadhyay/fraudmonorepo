@@ -1,7 +1,9 @@
 package org.frauddetection.servlet;
 
 import org.frauddetection.service.FraudDetectionHandler;
+import org.frauddetection.model.TransactionData;
 import org.json.JSONObject;
+import org.json.JSONException;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -17,43 +19,49 @@ public class DataReceiverServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        // Step 1: Read JSON data from request body
-        StringBuilder jsonPayloadfromrequest = new StringBuilder();
+        // Read JSON data
+        StringBuilder jsonPayload = new StringBuilder();
         try (BufferedReader reader = request.getReader()) {
             String line;
             while ((line = reader.readLine()) != null) {
-                jsonPayloadfromrequest.append(line);
+                jsonPayload.append(line);
             }
         }
-        // susbtitute this by JSON.parse as my ambition was json->object->json and in obj format the db and testcases will be done
-        // Step 2: Parse JSON data and process
+
         try {
-            JSONObject requestData = new JSONObject(jsonPayloadfromrequest.toString());
-
-            // Step 3: Process the transaction using FraudDetectionHandler
+            // Parse to JSONObject
+            JSONObject requestJson = new JSONObject(jsonPayload.toString());
+            
+            // Convert to TransactionData manually
+            TransactionData transactionData = new TransactionData(
+                requestJson.getLong("cc_num"),
+                requestJson.getDouble("amt"),
+                requestJson.getString("zip"),
+                requestJson.getDouble("lat"),
+                requestJson.getDouble("long"),
+                requestJson.getInt("city_pop"),
+                requestJson.getLong("unix_time"),
+                requestJson.getDouble("merch_lat"),
+                requestJson.getDouble("merch_long")
+            );
+            
+            // Process using handler with TransactionData
             FraudDetectionHandler handler = new FraudDetectionHandler();
-            JSONObject result = handler.processTransaction(requestData); //main method which processes the transaction and returns the result
-
-            // Step 4: Send the result back to the client
+            JSONObject result = handler.processTransaction(transactionData);
+            
+            // Send result back
             response.setContentType("application/json");
             response.getWriter().write(result.toString());
-
         } catch (Exception e) {
-            // Step 5: Handle exceptions and send error response
+            // Error handling
             response.setContentType("application/json");
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-
-            /**
-             * // Create a single error response object with appropriate details
-             *  // improv code by llm
-            String errorType = e instanceof org.json.JSONException ? "JSON parsing error" : "Processing error";
+            
             JSONObject errorResponse = new JSONObject()
-                .put("error", errorType)
+                .put("error", e instanceof JSONException ? "JSON parsing error" : "Processing error")
                 .put("message", e.getMessage());
                 
             response.getWriter().write(errorResponse.toString());
-             */
         }
     }
 }
