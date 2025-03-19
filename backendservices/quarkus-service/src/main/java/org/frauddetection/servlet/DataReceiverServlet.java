@@ -19,33 +19,41 @@ public class DataReceiverServlet extends HttpServlet {
             throws ServletException, IOException {
 
         // Step 1: Read JSON data from request body
-        StringBuilder jsonPayload = new StringBuilder();
+        StringBuilder jsonPayloadfromrequest = new StringBuilder();
         try (BufferedReader reader = request.getReader()) {
             String line;
             while ((line = reader.readLine()) != null) {
-                jsonPayload.append(line);
+                jsonPayloadfromrequest.append(line);
             }
         }
         // susbtitute this by JSON.parse as my ambition was json->object->json and in obj format the db and testcases will be done
         // Step 2: Parse JSON data and process
         try {
-            JSONObject requestData = new JSONObject(jsonPayload.toString());
+            JSONObject requestData = new JSONObject(jsonPayloadfromrequest.toString());
 
             // Step 3: Process the transaction using FraudDetectionHandler
             FraudDetectionHandler handler = new FraudDetectionHandler();
-            JSONObject result = handler.processTransaction(requestData);
+            JSONObject result = handler.processTransaction(requestData); //main method which processes the transaction and returns the result
 
             // Step 4: Send the result back to the client
             response.setContentType("application/json");
             response.getWriter().write(result.toString());
 
         } catch (Exception e) {
-            // Step 5: Handle errors
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            JSONObject errorResponse = new JSONObject();
-            errorResponse.put("error", "Invalid input data: " + e.getMessage());
+            // Step 5: Handle exceptions and send error response
             response.setContentType("application/json");
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            /**
+             * // Create a single error response object with appropriate details
+             *  // improv code by llm
+            String errorType = e instanceof org.json.JSONException ? "JSON parsing error" : "Processing error";
+            JSONObject errorResponse = new JSONObject()
+                .put("error", errorType)
+                .put("message", e.getMessage());
+                
             response.getWriter().write(errorResponse.toString());
+             */
         }
     }
 }

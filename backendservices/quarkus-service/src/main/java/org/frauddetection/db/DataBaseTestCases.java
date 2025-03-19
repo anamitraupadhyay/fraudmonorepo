@@ -10,7 +10,7 @@ public class DataBaseTestCases {
     public static final String DB_USER = "fraud_user";
     public static final String DB_PASSWORD = "fraud_pass";
 
-    // Load MariaDB JDBC Driver
+    // Load MariaDB JDBC Driver as static block so that during class loading it gets loaded by the class loader
     static {
         try {
             Class.forName("org.mariadb.jdbc.Driver");
@@ -19,7 +19,8 @@ public class DataBaseTestCases {
         }
     }
 
-    // Initialize the database (create database and tables if not exist)
+    /* Done by docker automatically so redundant
+    Initialize the database (create database and tables if not exist)
     public static boolean initDatabase() {
         Connection conn = null;
         Statement stmt = null;
@@ -76,7 +77,7 @@ public class DataBaseTestCases {
             } catch (SQLException ex) {
             }
         }
-    }
+    }*/
 
     // Get the last transaction for a given credit card number
     public static JSONObject getLastTransaction(long ccNum) {
@@ -104,16 +105,19 @@ public class DataBaseTestCases {
                 if (rs != null)
                     rs.close();
             } catch (SQLException ex) {
+                System.out.println("Error closing ResultSet: " + ex.getMessage());
             }
             try {
                 if (pstmt != null)
                     pstmt.close();
             } catch (SQLException ex) {
+                System.out.println("Error closing PreparedStatement: " + ex.getMessage());
             }
             try {
                 if (conn != null)
                     conn.close();
             } catch (SQLException ex) {
+                System.out.println("Error closing Connection: " + ex.getMessage());
             }
         }
         return null;
