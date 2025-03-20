@@ -19,11 +19,6 @@ public class FraudDetectionHandler {
     @Inject
     FraudDetectionHandler handler;
 
-    /**
-     * Process a transaction and check for fraud
-     * @param requestData the transaction data
-     * @return JSONObject with fraud prediction and reason
-     */
     private JSONObject convertToJson(TransactionData data) {
         JSONObject json = new JSONObject();
         json.put("cc_num", data.getCcNum());

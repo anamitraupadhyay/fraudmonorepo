@@ -11,12 +11,6 @@ import java.net.URL;
 
 public class ExternalServiceUtil {
 
-    /**
-     * Call the Python ML model service
-     * 
-     * @param requestData JSON data to be sent to the model
-     * @return The model's prediction as a JSONObject
-     */
     public static JSONObject callPythonModel(JSONObject requestData) throws IOException {
         System.out.println("Sending request to ML service: " + requestData.toString());
         try {
