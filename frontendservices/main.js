@@ -1,17 +1,3 @@
-// Import check
-try {
-  console.log("Main.js loading");
-  import('lit').then(lit => {
-    console.log("Lit loaded successfully", lit);
-  }).catch(err => {
-    console.error("Lit import failed:", err);
-    document.body.innerHTML += `<div class="alert alert-danger">Lit import error: ${err.message}</div>`;
-  });
-} catch (e) {
-  console.error("Import syntax error:", e);
-  document.body.innerHTML += `<div class="alert alert-danger">Import syntax error: ${e.message}</div>`;
-}
-
 // Import Lit and geocoding functions
 import { LitElement, html } from 'lit';
 import { getCoordinates, getCityPopulation } from './geocoding.js';
