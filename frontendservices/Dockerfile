@@ -2,13 +2,14 @@ FROM node:16-alpine
 
 WORKDIR /app
 
-RUN npm install -g http-server
+# Copy package files first to take advantage of Docker caching
+COPY package.json package-lock.json* ./
+RUN npm install
 
-COPY index.html .
-COPY main.js .
-COPY geocoding.js .
-COPY styles.css .
+# Copy all application files
+COPY . .
 
 EXPOSE 3000
 
-CMD ["http-server", "-p", "3000", "--cors"]
+# Use the npm start script from package.json
+CMD ["npm", "start"]

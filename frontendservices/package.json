@@ -5,11 +5,14 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "http-server -p 3000 -c-1"
+    "start": "http-server -p 3000 -c-1 --cors"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "lit": "^2.6.1"
+  },
   "devDependencies": {
     "es-module-shims": "^2.0.10",
     "http-server": "^14.1.1"
