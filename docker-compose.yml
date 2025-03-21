@@ -8,17 +8,18 @@ services:
       MYSQL_USER: fraud_user
       MYSQL_PASSWORD: fraud_pass
     ports:
-      - "3307:3306"
+      - "3306:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
       - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     networks:
       - fraud-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "fraud_user", "-pfraud_pass"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
       interval: 5s
       timeout: 5s
       retries: 5
+      start_period: 10s  # Give more time to initialize
 
   quarkus-service:
     build:
