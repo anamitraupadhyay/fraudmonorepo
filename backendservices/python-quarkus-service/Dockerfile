@@ -3,9 +3,10 @@
 WORKDIR /app
 
 COPY requirements.txt .
+
+# Install dependencies with fixed versions
 RUN pip install --no-cache-dir werkzeug==2.0.3
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir scikit-learn==1.0 imbalanced-learn==0.8.1
 
 COPY model_train.py .
 COPY app.py .
