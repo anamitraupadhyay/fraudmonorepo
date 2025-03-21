@@ -13,9 +13,10 @@ public class ExternalServiceUtil {
 
     public static JSONObject callPythonModel(JSONObject requestData) throws IOException {
         System.out.println("Sending request to ML service: " + requestData.toString());
+        HttpURLConnection conn = null;
         try {
             URL url = URI.create("http://python-quarkus-service:5000/predict").toURL();
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setDoOutput(true);
@@ -48,7 +49,7 @@ public class ExternalServiceUtil {
         }
         finally {
             if(conn != null){
-                conn.close();
+                conn.disconnect(); // Use disconnect() instead of close()
             }
         }
     }
