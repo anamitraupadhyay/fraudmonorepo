@@ -40,11 +40,11 @@ class FraudDetectionForm extends LitElement {
         amt: parseFloat(amt),
         zip: zip,
         lat: userCoords.lat,
-        long: userCoords.lng,
+        lon: userCoords.lng,
         city_pop: population,
         unix_time: Math.floor(Date.now() / 1000),
         merch_lat: merchantCoords.lat,
-        merch_long: merchantCoords.lng
+        merch_lon: merchantCoords.lng
       };
 
       // Send to backend API
