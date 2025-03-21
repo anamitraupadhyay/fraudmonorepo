@@ -15,7 +15,7 @@ services:
     networks:
       - fraud-network
     healthcheck:
-      ["CMD-SHELL", "mysqladmin ping -h localhost -uroot || exit 1"]
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -proot"]
       interval: 10s
       timeout: 5s
       retries: 5
