@@ -6,6 +6,10 @@
     <title>Fraud Detection</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    
+    <!-- Browser compatibility fix -->
+    <script src="browser-import-fix.js"></script>
+    
     <!-- Import Lit from CDN -->
     <script type="importmap">
     {
@@ -15,17 +19,15 @@
       }
     }
     </script>
-    <!-- CRITICAL: Load script as module -->
-    <script type="module" src="main.js"></script>
     <script async src="https://ga.jspm.io/npm:es-module-shims@1.7.0/dist/es-module-shims.js"></script>
-    <!-- Regular script tag for diagnostics -->
+    
+    <!-- Load scripts -->
+    <script type="module" src="main.js"></script>
     <script src="debug.js"></script>
 </head>
 <body>
-    <!-- Container with your custom element -->
     <div class="container mt-5">
         <h1 class="text-center">Fraud Detection System</h1>
-        <!-- Replace Alpine form with our web component -->
         <fraud-detection-form></fraud-detection-form>
     </div>
 </body>
