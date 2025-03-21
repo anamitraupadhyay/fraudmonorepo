@@ -4,3 +4,4 @@ numpy==1.20.3
 scikit-learn==1.0
 pickle-mixin==1.0.2
 imbalanced-learn==0.8.1
+scipy==1.7.1
