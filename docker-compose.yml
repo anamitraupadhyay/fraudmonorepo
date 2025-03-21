@@ -43,15 +43,6 @@ services:
     networks:
       - fraud-network
 
-  python-service:
-    build:
-      context: ./backendservices/python-service
-    container_name: python-service
-    ports:
-      - "8501:8501"
-    networks:
-      - fraud-network
-
   frontend:
     build:
       context: ./frontendservices
