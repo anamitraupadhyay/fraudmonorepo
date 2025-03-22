@@ -5,8 +5,10 @@ import org.frauddetection.model.TransactionData;
 import org.json.JSONObject;
 
 public class DataBaseTestCases {
-    // DB configuration
-    public static final String DB_URL = "jdbc:mariadb://mariadb:3306/fraud_detection";
+    // DB configuration - update port to match docker-compose
+    public static final String DB_URL = "jdbc:mariadb://mariadb:3306/fraud_detection?" +
+                                      "allowPublicKeyRetrieval=true&useSSL=false&" +
+                                      "connectTimeout=30000&socketTimeout=30000";
     public static final String DB_USER = "fraud_user";
     public static final String DB_PASSWORD = "fraud_pass";
 

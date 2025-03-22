@@ -8,39 +8,36 @@ services:
       MYSQL_USER: fraud_user
       MYSQL_PASSWORD: fraud_pass
     ports:
-      - "3307:3306"
+      - "3306:3306"  # Changed from 3307:3306
     volumes:
       - mariadb_data:/var/lib/mysql
       - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     networks:
       - fraud-network
-    healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -proot"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s  # Increase time for database to initialize
+    command: 
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    restart: always
 
   quarkus-service:
     build:
       context: ./backendservices/quarkus-service
-      dockerfile: src/main/docker/Dockerfile.jvm
+      dockerfile: Dockerfile
     container_name: quarkus-service
     environment:
-      - QUARKUS_DATASOURCE_JDBC_URL=jdbc:mariadb://mariadb:3306/fraud_detection
+      - JAVA_OPTS=-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager
+      - QUARKUS_DATASOURCE_JDBC_URL=jdbc:mariadb://mariadb:3306/fraud_detection?allowPublicKeyRetrieval=true&useSSL=false
       - QUARKUS_DATASOURCE_USERNAME=fraud_user
       - QUARKUS_DATASOURCE_PASSWORD=fraud_pass
-      - QUARKUS_HTTP_CORS=true
-      - QUARKUS_HTTP_CORS_ORIGINS=http://localhost:3000,http://frontend:3000
     ports:
       - "8080:8080"
     depends_on:
-      mariadb:
-        condition: service_healthy
-      python-quarkus-service:
-        condition: service_started
+      - mariadb
+      - python-quarkus-service
     networks:
       - fraud-network
+    restart: always
 
   python-quarkus-service:
     build:
@@ -50,6 +47,7 @@ services:
       - "5005:5000"
     networks:
       - fraud-network
+    restart: always
 
   frontend:
     build:
