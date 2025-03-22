@@ -9,14 +9,15 @@ COPY .mvn/ ./.mvn/
 COPY mvnw .
 COPY mvnw.cmd .
 
-# Make Maven wrapper executable
-RUN chmod +x ./mvnw
+# Fix line endings and make wrapper executable
+RUN sed -i 's/\r$//' mvnw && \
+    chmod +x mvnw
 
 # Copy source code
 COPY src/ ./src/
 
-# Show what was copied and build the app
-RUN ls -la && ./mvnw package -DskipTests
+# Build using Maven directly instead of wrapper to avoid platform issues
+RUN ls -la && mvn package -DskipTests
 
 # Create runtime image
 FROM registry.access.redhat.com/ubi9/openjdk-21-runtime:1.21
