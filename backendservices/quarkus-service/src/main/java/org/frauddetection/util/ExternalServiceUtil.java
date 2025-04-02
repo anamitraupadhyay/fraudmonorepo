@@ -13,6 +13,7 @@ public class ExternalServiceUtil {
 
     public static JSONObject callPythonModel(JSONObject requestData) throws IOException {
         System.out.println("Sending request to ML service: " + requestData.toString());
+        //console debug point
         
         // Add retry logic
         int maxRetries = 3;
@@ -45,6 +46,7 @@ public class ExternalServiceUtil {
                 }
             } catch (IOException e) {
                 System.err.println("ML service error (attempt " + attempt + "): " + e.getMessage());
+                //console debug point
                 if (attempt < maxRetries) {
                     try {
                         Thread.sleep(retryDelayMs);
@@ -64,11 +66,5 @@ public class ExternalServiceUtil {
                 }
             }
         }
-        
-        // Should never reach here
-        JSONObject errorResponse = new JSONObject();
-        errorResponse.put("prediction", 0);
-        errorResponse.put("reason", "ML service unavailable - using safe default");
-        return errorResponse;
     }
 }

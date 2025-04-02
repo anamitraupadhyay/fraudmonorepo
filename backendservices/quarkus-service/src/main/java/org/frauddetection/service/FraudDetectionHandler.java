@@ -62,7 +62,8 @@ public class FraudDetectionHandler {
                     requestData
                 );
             }
-        } else {
+        }
+        else {
             // Existing user - check speed between transactions
             long lastUnixTime = lastTransaction.getLong("unix_time");
             
@@ -70,14 +71,15 @@ public class FraudDetectionHandler {
             if (unixTime <= lastUnixTime) {
                 responseJson.put("prediction", 0);
                 responseJson.put("reason", "Transaction timestamp valid");
-            } else {
+            } 
+            else {
                 // Calculate travel metrics
                 double lastLat = lastTransaction.getDouble("lat");
                 double lastLon = lastTransaction.getDouble("long");
                 double distanceKm = FraudDetectionUtils.haversine(lastLat, lastLon, lat, lon);
                 
-                // Only check speed if distance is significant (>1km)
-                if (distanceKm > 1.0) {
+                // Only check speed if distance is significant (>500km)
+                if (distanceKm > 500.0) {
                     double timeDiffHours = (unixTime - lastUnixTime) / 3600.0;
                     double speedKmh = distanceKm / timeDiffHours;
                     
