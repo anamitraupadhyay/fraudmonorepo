@@ -21,6 +21,10 @@ public class DataBaseTestCases {
         }
     }
 
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+    }
+
     // Get the last transaction for a given credit card number
     public static JSONObject getLastTransaction(long ccNum) {
         Connection conn = null;
