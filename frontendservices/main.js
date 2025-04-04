@@ -40,11 +40,11 @@ class FraudDetectionForm extends LitElement {
         amt: parseFloat(amt),
         zip: zip,
         lat: userCoords.lat,
-        long: userCoords.lng,      // Change from 'lon'
+        long: userCoords.lng,      
         city_pop: population,
         unix_time: Math.floor(Date.now() / 1000),
         merch_lat: merchantCoords.lat,
-        merch_long: merchantCoords.lng  // Change from 'merch_lon'
+        merch_long: merchantCoords.lng  
       };
 
       // Send to backend API
@@ -57,27 +57,112 @@ class FraudDetectionForm extends LitElement {
 
       // Process response
       const result = await response.json();
+      
+      // Build result HTML
+      let resultHTML = '';
 
-      // Show result with formatting based on prediction
+      // Show transaction result with formatting based on prediction
       if (result.prediction === 1 || result.prediction === "1") {
-        resultDiv.innerHTML = `
+        resultHTML += `
           <div class="alert alert-danger">
             <h4>Fraud Detected!</h4>
             <p>${result.reason || 'No reason provided'}</p>
           </div>
         `;
       } else {
-        resultDiv.innerHTML = `
+        resultHTML += `
           <div class="alert alert-success">
             <h4>Transaction Appears Safe</h4>
             <p>${result.reason || 'No reason provided'}</p>
+            ${result.warning ? `<p class="text-warning"><strong>Warning:</strong> ${result.warning}</p>` : ''}
           </div>
         `;
+        
+        // Add merchant analytics if available
+        if (result.analytics) {
+          resultHTML += this.renderAnalytics(result.analytics);
+        }
       }
+
+      resultDiv.innerHTML = resultHTML;
 
     } catch (error) {
       resultDiv.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
     }
+  }
+  
+  /**
+   * Renders merchant analytics data
+   */
+  renderAnalytics(analytics) {
+    if (!analytics) return '';
+    
+    let html = '<div class="card mt-3"><div class="card-header bg-info text-white"><h5 class="mb-0">Merchant Analytics</h5></div><div class="card-body">';
+    
+    // Add high risk hour information
+    if (analytics.is_high_risk_hour !== undefined) {
+      html += `
+        <div class="alert ${analytics.is_high_risk_hour ? 'alert-warning' : 'alert-info'}">
+          <strong>Time Analysis:</strong> 
+          ${analytics.is_high_risk_hour ? 'This hour is historically high-risk for this merchant.' : 'This hour is not historically high-risk.'}
+        </div>
+      `;
+    }
+    
+    // Add merchant risk information if available
+    if (analytics.merchant_risk) {
+      const risk = analytics.merchant_risk;
+      const riskClass = {
+        'high': 'danger',
+        'medium': 'warning',
+        'low': 'success'
+      }[risk.risk_level] || 'info';
+      
+      html += `
+        <div class="card mb-3">
+          <div class="card-header bg-${riskClass} text-white">
+            <h6 class="mb-0">Merchant Risk: ${risk.risk_level.toUpperCase()}</h6>
+          </div>
+          <div class="card-body">
+            <table class="table table-sm table-striped">
+              <tbody>
+                <tr>
+                  <th>Location</th>
+                  <td>${risk.merchant_location}</td>
+                </tr>
+                <tr>
+                  <th>Total Transactions</th>
+                  <td>${risk.total_transactions}</td>
+                </tr>
+                <tr>
+                  <th>Unique Cards</th>
+                  <td>${risk.unique_cards}</td>
+                </tr>
+                <tr>
+                  <th>Fraud Transactions</th>
+                  <td>${risk.fraud_transactions}</td>
+                </tr>
+                <tr>
+                  <th>Fraud Rate</th>
+                  <td>${risk.fraud_rate_percent.toFixed(2)}%</td>
+                </tr>
+                <tr>
+                  <th>Card Diversity</th>
+                  <td>${risk.card_diversity.toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <th>Avg Transaction Amount</th>
+                  <td>$${risk.average_transaction_amount.toFixed(2)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+    
+    html += '</div></div>';
+    return html;
   }
 
   /**
@@ -118,5 +203,6 @@ class FraudDetectionForm extends LitElement {
     `;
   }
 }
+
 // Register the custom element
 customElements.define('fraud-detection-form', FraudDetectionForm);
