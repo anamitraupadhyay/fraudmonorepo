@@ -62,7 +62,9 @@ public class FraudDetectionHandler {
                     requestData
                 );
             }
-        }
+            //else (responseJson.geInt("prediction") == 0 ){
+                //responseJson.optString("reason","Ml model detected no fraud");
+        //} //as this part is already done in app.py an already responseJson is storing the 2 part json
         else {
             // Existing user - check speed between transactions
             long lastUnixTime = lastTransaction.getLong("unix_time");
