@@ -25,13 +25,26 @@ public class DataBaseTestCases {
         return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
     }
 
+    // Helper method to close resources - add this
+    public static void closeResources(ResultSet rs, Statement stmt, Connection conn) {
+        try { if (rs != null) rs.close(); } catch (SQLException e) {
+            System.err.println("Error closing ResultSet: " + e.getMessage());
+        }
+        try { if (stmt != null) stmt.close(); } catch (SQLException e) {
+            System.err.println("Error closing Statement: " + e.getMessage());
+        }
+        try { if (conn != null) conn.close(); } catch (SQLException e) {
+            System.err.println("Error closing Connection: " + e.getMessage());
+        }
+    }
+
     // Get the last transaction for a given credit card number
     public static JSONObject getLastTransaction(long ccNum) {
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         try {
-            conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+            conn = getConnection(); // Use the method instead of direct creation
             String query = "SELECT unix_time, lat, `long` FROM transactions WHERE cc_num = ? "
                     + "ORDER BY unix_time DESC LIMIT 1";
             pstmt = conn.prepareStatement(query);
@@ -47,24 +60,7 @@ public class DataBaseTestCases {
         } catch (SQLException e) {
             System.out.println("Database error in getLastTransaction: " + e.getMessage());
         } finally {
-            try {
-                if (rs != null)
-                    rs.close();
-            } catch (SQLException ex) {
-                System.out.println("Error closing ResultSet: " + ex.getMessage());
-            }
-            try {
-                if (pstmt != null)
-                    pstmt.close();
-            } catch (SQLException ex) {
-                System.out.println("Error closing PreparedStatement: " + ex.getMessage());
-            }
-            try {
-                if (conn != null)
-                    conn.close();
-            } catch (SQLException ex) {
-                System.out.println("Error closing Connection: " + ex.getMessage());
-            }
+            closeResources(rs, pstmt, conn); // Use the helper method
         }
         return null;
     }
@@ -74,7 +70,7 @@ public class DataBaseTestCases {
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {
-            conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+            conn = getConnection(); // Use the method instead of direct creation
             String query = "INSERT INTO transactions (cc_num, amt, zip, lat, `long`, city_pop, unix_time, merch_lat, merch_long) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             pstmt = conn.prepareStatement(query);
@@ -93,16 +89,7 @@ public class DataBaseTestCases {
             System.out.println("Database error in storeTransaction: " + e.getMessage());
             return false;
         } finally {
-            try {
-                if (pstmt != null)
-                    pstmt.close();
-            } catch (SQLException ex) {
-            }
-            try {
-                if (conn != null)
-                    conn.close();
-            } catch (SQLException ex) {
-            }
+            closeResources(null, pstmt, conn); // Use the helper method
         }
     }
 
@@ -111,7 +98,7 @@ public class DataBaseTestCases {
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {
-            conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+            conn = getConnection(); // Use the method instead of direct creation
             String query = "INSERT INTO fraud_logs (cc_num, reason, transaction_data) VALUES (?, ?, ?)";
             pstmt = conn.prepareStatement(query);
             pstmt.setLong(1, ccNum);
@@ -123,19 +110,9 @@ public class DataBaseTestCases {
             System.out.println("Database error in logFraud: " + e.getMessage());
             return false;
         } finally {
-            try {
-                if (pstmt != null)
-                    pstmt.close();
-            } catch (SQLException ex) {
-            }
-            try {
-                if (conn != null)
-                    conn.close();
-            } catch (SQLException ex) {
-            }
+            closeResources(null, pstmt, conn); // Use the helper method
         }
     }
-}
 
     /* Done by docker automatically so redundant
     Initialize the database (create database and tables if not exist)
@@ -184,16 +161,8 @@ public class DataBaseTestCases {
             System.out.println("Database initialization error: " + e.getMessage());
             return false;
         } finally {
-            try {
-                if (stmt != null)
-                    stmt.close();
-            } catch (SQLException ex) {
-            }
-            try {
-                if (conn != null)
-                    conn.close();
-            } catch (SQLException ex) {
-            }
+            closeResources(null, stmt, conn);
         }
     }*/
+}
 

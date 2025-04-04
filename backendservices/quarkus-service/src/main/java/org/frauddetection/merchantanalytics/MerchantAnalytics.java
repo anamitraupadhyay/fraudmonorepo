@@ -7,6 +7,12 @@ import org.frauddetection.db.DataBaseTestCases;
 
 public class MerchantAnalytics {
 
+    // Add constants for repeated values
+    private static final double MERCHANT_RADIUS = 0.01; // ~1km radius
+    private static final int MIN_TRANSACTIONS = 10;     // Minimum sample size
+    private static final double HIGH_RISK_THRESHOLD = 5.0;  // % for high risk
+    private static final double MEDIUM_RISK_THRESHOLD = 1.0; // % for medium risk
+
     /**
      * Test Case 1: Check if transaction is at high-risk hour
      */
@@ -28,7 +34,7 @@ public class MerchantAnalytics {
                          "FROM transactions t " +
                          "LEFT JOIN fraud_logs fl ON t.cc_num = fl.cc_num AND " +
                          "t.unix_time = JSON_EXTRACT(fl.transaction_data, '$.unix_time') " +
-                         "WHERE ABS(t.merch_lat - ?) < 0.01 AND ABS(t.merch_long - ?) < 0.01 " +
+                         "WHERE ABS(t.merch_lat - ?) < " + MERCHANT_RADIUS + " AND ABS(t.merch_long - ?) < " + MERCHANT_RADIUS + " " +
                          "AND HOUR(FROM_UNIXTIME(t.unix_time)) = ?";
             
             stmt = conn.prepareStatement(query);
@@ -41,7 +47,7 @@ public class MerchantAnalytics {
                 int totalTxns = rs.getInt("total_txns");
                 int fraudCount = rs.getInt("fraud_count");
                 
-                return (totalTxns >= 10 && ((double)fraudCount / totalTxns) > 0.05);
+                return (totalTxns >= MIN_TRANSACTIONS && ((double)fraudCount / totalTxns) > HIGH_RISK_THRESHOLD / 100.0);
             }
             return false;
         } catch (SQLException e) {
@@ -72,7 +78,7 @@ public class MerchantAnalytics {
                          "FROM transactions t " +
                          "LEFT JOIN fraud_logs fl ON t.cc_num = fl.cc_num AND " +
                          "t.unix_time = JSON_EXTRACT(fl.transaction_data, '$.unix_time') " +
-                         "WHERE ABS(t.merch_lat - ?) < 0.01 AND ABS(t.merch_long - ?) < 0.01";
+                         "WHERE ABS(t.merch_lat - ?) < " + MERCHANT_RADIUS + " AND ABS(t.merch_long - ?) < " + MERCHANT_RADIUS;
             
             stmt = conn.prepareStatement(query);
             stmt.setDouble(1, merchantLat);
@@ -99,9 +105,9 @@ public class MerchantAnalytics {
                 result.put("average_transaction_amount", avgAmount);
                 
                 // Assign risk level
-                if (fraudRate > 5.0) {
+                if (fraudRate > HIGH_RISK_THRESHOLD) {
                     result.put("risk_level", "high");
-                } else if (fraudRate > 1.0) {
+                } else if (fraudRate > MEDIUM_RISK_THRESHOLD) {
                     result.put("risk_level", "medium");
                 } else {
                     result.put("risk_level", "low");
