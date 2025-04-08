@@ -48,7 +48,7 @@ public class ExternalServiceUtil {
              .POST(HttpRequest.BodyPublishers.ofString(data.toString()))
              .build();
              HttpClient client = HttpClient.newHttpClient();
-             client.senAsync(request, HttpResponse.Bodyhandler.discarding());
+             client.sendAsync(request, HttpResponse.Bodyhandler.discarding());
              //this is a fire and forget request, no need to wait for response
              //if you want to wait for response, use send() method instead of sendAsync()
              //and handle the response accordingly
