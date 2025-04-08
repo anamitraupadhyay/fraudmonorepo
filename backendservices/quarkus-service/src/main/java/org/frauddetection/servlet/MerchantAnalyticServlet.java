@@ -11,8 +11,7 @@ import java.io.IOException;
 public class MerchantAnalyticsHandler extends HttpServlet {
 
   @Override
-  public static void doGet(HttpServletRequest request, HttpServletResponse response)
-          throws ServletException, IOException {
+  public static void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     //it will not take any data just emit the data that is required for the analytics as per customized request from customer
     //now this servlet is getting same state response as data-handler which is what i needed for my use case and as per experience its a design flaw of the current implementation using servlet but any way its desired for now
     //another mistake as request.getInputStream or request.getReader is one time use stream and its been already been read at data-handler servlet so caching is necessary instead rereading and attach it for this servlet...the part added for this part will be commented "cached and attached for analytics servlet"
@@ -24,8 +23,9 @@ public class MerchantAnalyticsHandler extends HttpServlet {
     *    }
     *  }
     */
+   JSONObject requestJson = (JSONObject) request.getAttribute("requestJson");
+   TransactionData transactionData = (TransactionData) request.getAttribute("transactionData");
 
-    response.setContentType("application/json");
-    response.getWriter().write. (.toString());
+   //now we can literally use the data as per our requirement no whatsowever issues passing into methods
     }
   }

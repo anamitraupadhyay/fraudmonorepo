@@ -49,8 +49,13 @@ public class DataReceiverServlet extends HttpServlet {
             FraudDetectionHandler handler = new FraudDetectionHandler();
             JSONObject result = handler.processTransaction(transactionData);
 
-            //cached and attached for analytic servlet and also we can forward objects using requestdispatcher  
+            // Now making the request as setAttribute and making it available to merchantanalyticservlet for access
+            // Need to setAttribute the jsonpayload as its been from the buffer before sending
+            // and also the transactionData object as we need to access it in the merchant analytic servlet 
+            request.setAttribute("requestJson",requestJson);
+            request.setAttribute("transactionData",transactionData);
 
+            //cached and attached for analytic servlet and also we can forward objects using requestdispatcher  
             // Discarded the failsafe analogy where we are developing this analytics as if all testcases passed then we will be needing another set merchant based data for better decision making now its all attached even if ml and distance testcases failed
             RequestDispatcher dispatcherobj = request.getRequestDispatcher("/merchant-analytics");
             dispatcherobj.forward(request, response);
