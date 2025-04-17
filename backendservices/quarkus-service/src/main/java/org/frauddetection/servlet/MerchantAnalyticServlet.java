@@ -26,6 +26,8 @@ public class MerchantAnalyticsHandler extends HttpServlet {
    JSONObject requestJson = (JSONObject) request.getAttribute("requestJson");
    TransactionData transactionData = (TransactionData) request.getAttribute("transactionData");
 
+
+
    //now we can literally use the data as per our requirement no whatsowever issues passing into methods
     }
   }
