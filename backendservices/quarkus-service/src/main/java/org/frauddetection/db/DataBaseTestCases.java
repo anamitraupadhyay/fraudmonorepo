@@ -20,6 +20,30 @@ public class DataBaseTestCases {
             System.err.println("MariaDB JDBC Driver not found: " + e.getMessage());
         }
     }
+    // its the all info collected from db to analyze the merchant analytics servlet
+    public static JSONObject merchDataRequirements(long merch_lat, long merch_long) {
+        Connection conn = null;
+        PrepareedStatement pstmt = null;
+        ResultSet rs = null;
+        try{
+            conn = DriverManager.getCOnnection(DB_URL, DB_USER, DB_PASSWORD);
+            String Query = "SELECT " +
+                    "COUNT (*) AS total_transactions," +
+                    "COUNT (DISTINCT cc_num) AS unique_cards," +
+                    "SUM (CASE WHEN is_fraud=1 THEN 1 ELSE 0 END) AS fraud_transactions," +
+                    "AVG(amt) AS avg_transac_amt" +
+                    "FROM transactions" +
+                    "WHERE FLOOR(merch_lat)=? AND FLOOR(merch_long)=?";
+            pstmt = conn.prepareStatement(query);
+            pstmt.setLong(1,merch_lat);
+            pstmt.setLong(2,merch_long);
+            rs=pstmt.executeQuery();
+            if (rs.next()) {
+                MerchantRisk transobj = new MerchantRisk();//import stmt required dont forget
+                transobj.
+            }
+        }
+    }
 
     // Get the last transaction for a given credit card number
     public static JSONObject getLastTransaction(long ccNum) {

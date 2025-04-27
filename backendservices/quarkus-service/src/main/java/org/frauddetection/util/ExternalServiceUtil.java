@@ -39,7 +39,7 @@ public class ExternalServiceUtil {
         return new JSONObject(responseBuilder.toString());
     }
     public static void callKtorDataAnonymizationMicroservice(JSONObject data) throws IOException {
-     System.out.println("Calling Ktor data anonymization microservce with no payload:" +data.toString());
+     System.out.println("Calling go data anonymization microservce with no payload:" +data.toString());
      URI uriobj = URI.create("http://.../anonymize"); //no need to use .toURL() here as newBuilder works with only URI
      HttpRequest request = HttpRequest.newBuilder()
              .uri(uriobj)
