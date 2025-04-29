@@ -17,7 +17,7 @@ import java.io.IOException;
 public class DataReceiverServlet extends HttpServlet {
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // Read JSON data
         StringBuilder jsonPayload = new StringBuilder();
@@ -54,6 +54,8 @@ public class DataReceiverServlet extends HttpServlet {
             // and also the transactionData object as we need to access it in the merchant analytic servlet 
             request.setAttribute("requestJson",requestJson);
             request.setAttribute("transactionData",transactionData);
+            request.setAttribute("result", result);
+            // Now we can use the request object to forward the data to the merchant analytic servlet
 
             //cached and attached for analytic servlet and also we can forward objects using requestdispatcher  
             // Discarded the failsafe analogy where we are developing this analytics as if all testcases passed then we will be needing another set merchant based data for better decision making now its all attached even if ml and distance testcases failed
@@ -62,7 +64,7 @@ public class DataReceiverServlet extends HttpServlet {
             
             // Send result back
             response.setContentType("application/json");
-            response.getWriter().write(result.toString());
+            response.getWriter().write(result.toString()); //result.toString() is the final json object we are sending to the frontend
         } catch (Exception e) {
             // Error handling
             response.setContentType("application/json");

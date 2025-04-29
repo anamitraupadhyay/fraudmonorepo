@@ -1,11 +1,7 @@
-// Import Lit and geocoding functions
 import { LitElement, html } from 'lit';
 import { getCoordinates, getCityPopulation } from './geocoding.js';
 
 class FraudDetectionForm extends LitElement {
-  /**
-   * Don't use shadow DOM so Bootstrap styles apply directly
-   */
   createRenderRoot() {
     return this;
   }
@@ -15,8 +11,7 @@ class FraudDetectionForm extends LitElement {
 
     const resultDiv = document.getElementById('result');
     resultDiv.innerHTML = '<div class="alert alert-info">Processing...</div>';
-    
-    // Get form values
+
     const ccNum = document.getElementById('ccNum').value;
     const amt = document.getElementById('amt').value;
     const zip = document.getElementById('zip').value;
@@ -24,7 +19,6 @@ class FraudDetectionForm extends LitElement {
     const merchantLocation = document.getElementById('merchantLocation').value;
 
     try {
-      // Get coordinates for locations
       const userCoords = await getCoordinates(userLocation);
       const merchantCoords = await getCoordinates(merchantLocation);
       const population = await getCityPopulation(userLocation);
@@ -34,20 +28,18 @@ class FraudDetectionForm extends LitElement {
         return;
       }
 
-      // Prepare data for backend
       const data = {
         cc_num: ccNum,
         amt: parseFloat(amt),
         zip: zip,
         lat: userCoords.lat,
-        long: userCoords.lng,      // Change from 'lon'
+        long: userCoords.lng,
         city_pop: population,
         unix_time: Math.floor(Date.now() / 1000),
         merch_lat: merchantCoords.lat,
-        merch_long: merchantCoords.lng  // Change from 'merch_lon'
+        merch_long: merchantCoords.lng
       };
 
-      // Send to backend API
       const host = window.location.hostname === 'localhost' ? 'localhost' : 'quarkus-service';
       const response = await fetch(`http://${host}:8080/data-handler`, {
         method: 'POST',
@@ -55,19 +47,19 @@ class FraudDetectionForm extends LitElement {
         body: JSON.stringify(data)
       });
 
-      // Process response
       const result = await response.json();
 
-      // Show result with formatting based on prediction
+      let output = '';
+
       if (result.prediction === 1 || result.prediction === "1") {
-        resultDiv.innerHTML = `
+        output += `
           <div class="alert alert-danger">
             <h4>Fraud Detected!</h4>
             <p>${result.reason || 'No reason provided'}</p>
           </div>
         `;
       } else {
-        resultDiv.innerHTML = `
+        output += `
           <div class="alert alert-success">
             <h4>Transaction Appears Safe</h4>
             <p>${result.reason || 'No reason provided'}</p>
@@ -75,48 +67,60 @@ class FraudDetectionForm extends LitElement {
         `;
       }
 
+      if (result.analytics) {
+        const a = result.analytics;
+        output += `
+          <div class="card mt-4">
+            <div class="card-header"><strong>Merchant Risk Analytics</strong></div>
+            <div class="card-body">
+              <p><strong>High Risk Hour:</strong> ${a.isHighRiskHour ? 'Yes' : 'No'}</p>
+              <p><strong>Merchant Location:</strong> ${a.merchantRisk.merchantLocation}</p>
+              <p><strong>Total Transactions:</strong> ${a.merchantRisk.totalTransactions}</p>
+              <p><strong>Unique Cards:</strong> ${a.merchantRisk.uniqueCards}</p>
+              <p><strong>Fraud Transactions:</strong> ${a.merchantRisk.fraudTransactions}</p>
+              <p><strong>Fraud Rate:</strong> ${a.merchantRisk.fraudRatePercent}%</p>
+              <p><strong>Card Diversity:</strong> ${a.merchantRisk.cardDiversity}</p>
+              <p><strong>Avg Transaction Amount:</strong> $${a.merchantRisk.averageTransactionAmount}</p>
+            </div>
+          </div>
+        `;
+      }
+
+      resultDiv.innerHTML = output;
+
     } catch (error) {
       resultDiv.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
     }
   }
 
-  /**
-   * Render the component
-   */
   render() {
     return html`
       <form id="fraudForm" @submit=${this.submitForm}>
         <div class="form-group">
           <label for="ccNum">Credit Card Number</label>
-          <input type="text" class="form-control" id="ccNum" name="cc_num" required>
+          <input type="text" class="form-control" id="ccNum" required>
         </div>
-
         <div class="form-group">
           <label for="amt">Amount</label>
-          <input type="number" class="form-control" id="amt" name="amt" required>
+          <input type="number" class="form-control" id="amt" required>
         </div>
-
         <div class="form-group">
           <label for="zip">ZIP Code</label>
-          <input type="text" class="form-control" id="zip" name="zip" required>
+          <input type="text" class="form-control" id="zip" required>
         </div>
-
         <div class="form-group">
           <label for="userLocation">User Location</label>
-          <input type="text" class="form-control" id="userLocation" name="user_location" required>
+          <input type="text" class="form-control" id="userLocation" required>
         </div>
-
         <div class="form-group">
           <label for="merchantLocation">Merchant Location</label>
-          <input type="text" class="form-control" id="merchantLocation" name="merchant_location" required>
+          <input type="text" class="form-control" id="merchantLocation" required>
         </div>
-
         <button type="submit" class="btn btn-primary">Submit</button>
       </form>
-
       <div id="result" class="mt-4"></div>
     `;
   }
 }
-// Register the custom element
+
 customElements.define('fraud-detection-form', FraudDetectionForm);

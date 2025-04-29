@@ -21,30 +21,120 @@ public class DataBaseTestCases {
         }
     }
     // its the all info collected from db to analyze the merchant analytics servlet
-    public static JSONObject merchDataRequirements(long merch_lat, long merch_long) {
+        public static JSONObject getHighRiskHour(long unixTime) {
         Connection conn = null;
-        PrepareedStatement pstmt = null;
+        PreparedStatement pstmt = null;
         ResultSet rs = null;
-        try{
-            conn = DriverManager.getCOnnection(DB_URL, DB_USER, DB_PASSWORD);
-            String Query = "SELECT " +
-                    "COUNT (*) AS total_transactions," +
-                    "COUNT (DISTINCT cc_num) AS unique_cards," +
-                    "SUM (CASE WHEN is_fraud=1 THEN 1 ELSE 0 END) AS fraud_transactions," +
-                    "AVG(amt) AS avg_transac_amt" +
-                    "FROM transactions" +
-                    "WHERE FLOOR(merch_lat)=? AND FLOOR(merch_long)=?";
+        try {
+            conn = getConnection();
+            String query = "SELECT " +
+                "HOUR(FROM_UNIXTIME(unix_time)) AS txn_hour, " +
+                "COUNT(*) AS total_count, " +
+                "SUM(CASE WHEN fl.id IS NOT NULL THEN 1 ELSE 0 END) AS fraud_count " +
+                "FROM transactions t " +
+                "LEFT JOIN fraud_logs fl ON t.cc_num = fl.cc_num AND " +
+                "t.unix_time = JSON_EXTRACT(fl.transaction_data, '$.unix_time') " +
+                "WHERE HOUR(FROM_UNIXTIME(unix_time)) = HOUR(FROM_UNIXTIME(?)) " +
+                "GROUP BY HOUR(FROM_UNIXTIME(unix_time))";
+
             pstmt = conn.prepareStatement(query);
-            pstmt.setLong(1,merch_lat);
-            pstmt.setLong(2,merch_long);
-            rs=pstmt.executeQuery();
+            pstmt.setLong(1, unixTime);
+            
+            rs = pstmt.executeQuery();
             if (rs.next()) {
-                MerchantRisk transobj = new MerchantRisk();//import stmt required dont forget
-                transobj.
+                JSONObject obj = new JSONObject();
+                obj.put("txn_hour", rs.getInt("txn_hour"));
+                obj.put("total_count", rs.getInt("total_count"));
+                obj.put("fraud_count", rs.getInt("fraud_count"));
+                return obj;
             }
+            return new JSONObject().put("error", "No data found");
+        } catch (SQLException e) {
+            return new JSONObject().put("error", "Database error: " + e.getMessage());
+        } finally {
+            closeResources(rs, pstmt, conn);
         }
     }
 
+    public static MerchDataNeeds merchDataRequirements(double merchLat, double merchLong) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try {
+            conn = getConnection();
+            String query = "SELECT " +
+                    "COUNT(*) AS total_transactions, " +
+                    "COUNT(DISTINCT cc_num) AS unique_cards, " +
+                    "SUM(CASE WHEN fl.id IS NOT NULL THEN 1 ELSE 0 END) AS fraud_transactions, " +
+                    "AVG(amt) AS avg_transac_amt " +
+                    "FROM transactions t " +
+                    "LEFT JOIN fraud_logs fl ON t.cc_num = fl.cc_num AND " +
+                    "t.unix_time = JSON_EXTRACT(fl.transaction_data, '$.unix_time') " +
+                    "WHERE ABS(t.merch_lat - ?) < " + MERCHANT_RADIUS + " AND ABS(t.merch_long - ?) < " + MERCHANT_RADIUS;
+            
+            pstmt = conn.prepareStatement(query);
+            pstmt.setDouble(1, merchLat);
+            pstmt.setDouble(2, merchLong);
+            rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                MerchDataNeeds dataNeeds = new MerchDataNeeds();
+                
+                int totalTxns = rs.getInt("total_transactions");
+                int uniqueCards = rs.getInt("unique_cards");
+                int fraudCount = rs.getInt("fraud_transactions");
+                double avgAmount = rs.getDouble("avg_transac_amt");
+                
+                // Calculate metrics
+                double fraudRate = totalTxns > 0 ? (fraudCount * 100.0 / totalTxns) : 0;
+                double cardDiversity = totalTxns > 0 ? ((double)uniqueCards / totalTxns) : 0;
+                
+                // Determine risk level
+                String riskLevel = "low";
+                if (fraudRate > HIGH_RISK_THRESHOLD) {
+                    riskLevel = "high";
+                } else if (fraudRate > MEDIUM_RISK_THRESHOLD) {
+                    riskLevel = "medium";
+                }
+                
+                // Set values
+                dataNeeds.setMerchantLocation(merchLat + "," + merchLong);
+                dataNeeds.setTotalTransactions(totalTxns);
+                dataNeeds.setUniqueCards(uniqueCards);
+                dataNeeds.setFraudTransactions(fraudCount);
+                dataNeeds.setFraudRatePercent(fraudRate);
+                dataNeeds.setCardDiversity(cardDiversity);
+                dataNeeds.setAverageTransactionAmount(avgAmount);
+                dataNeeds.setRiskLevel(riskLevel);
+                
+                return dataNeeds;
+            }
+            return null;
+        } catch (SQLException e) {
+            System.err.println("Database error in merchDataRequirements: " + e.getMessage());
+            return null;
+        } finally {
+            closeResources(rs, pstmt, conn);
+        }
+    }
+    
+    // Helper method to get connection
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+    }
+    
+    // Helper method to close resources
+    private static void closeResources(ResultSet rs, Statement stmt, Connection conn) {
+        try {
+            if (rs != null) rs.close();
+        } catch (SQLException e) {}
+        try {
+            if (stmt != null) stmt.close();
+        } catch (SQLException e) {}
+        try {
+            if (conn != null) conn.close();
+        } catch (SQLException e) {}
+    }
     // Get the last transaction for a given credit card number
     public static JSONObject getLastTransaction(long ccNum) {
         Connection conn = null;
