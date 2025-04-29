@@ -70,7 +70,7 @@ private static final double MEDIUM_RISK_THRESHOLD = 1.0;
             conn = getConnection();
             String query = "SELECT " +
                     "COUNT(*) AS total_transactions, " +
-                    "COUNT(DISTINCT cc_num) AS unique_cards, " +
+                    "COUNT(DISTINCT t.cc_num) AS unique_cards, " +
                     "SUM(CASE WHEN fl.id IS NOT NULL THEN 1 ELSE 0 END) AS fraud_transactions, " +
                     "AVG(amt) AS avg_transac_amt " +
                     "FROM transactions t " +
@@ -104,7 +104,7 @@ private static final double MEDIUM_RISK_THRESHOLD = 1.0;
                 }
                 
                 // Set values
-                dataNeeds.setMerchantLocation(merchLat + "," + merchLong);
+                dataNeeds.setMerchantLocation(String.format("%.6f, %.6f", merchLat, merchLong));
                 dataNeeds.setTotalTransactions(totalTxns);
                 dataNeeds.setUniqueCards(uniqueCards);
                 dataNeeds.setFraudTransactions(fraudCount);
