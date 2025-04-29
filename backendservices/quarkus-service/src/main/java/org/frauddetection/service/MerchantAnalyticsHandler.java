@@ -2,9 +2,8 @@ package org.frauddetection.service;
 
 import org.frauddetection.db.DataBaseTestCases;
 import org.frauddetection.model.TransactionData;
-import org.frauddetection.model.MerchDataNeeds;
-import org.frauddetection.model.MerchantRisk;
-import org.frauddetection.model.Analytics;
+import org.frauddetection.model.*;
+
 import org.json.JSONObject;
 
 public class MerchantAnalyticsHandler {
@@ -71,8 +70,7 @@ public class MerchantAnalyticsHandler {
         result.put("fraudRatePercent", merchantData.getFraudRatePercent());
         result.put("cardDiversity", merchantData.getCardDiversity());
         result.put("averageTransactionAmount", merchantData.getAverageTransactionAmount());
-        //result.put("riskLevel", merchantData.getRiskLevel());
+        result.put("riskLevel", merchantData.getRiskLevel());
         
         return result;
     }
-}

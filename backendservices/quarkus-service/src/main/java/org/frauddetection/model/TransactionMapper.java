@@ -1,36 +1,16 @@
 package org.frauddetection.model;
 
-class MerchDataNeedsMapper {
+public class TransactionMapper {
+    // Public facade methods that delegate to the individual mappers
     public static MerchantRisk toMerchantRisk(MerchDataNeeds data) {
-        return new MerchantRisk.Builder()
-            .merchantLocation(data.getMerchantLocation())
-            .totalTransactions(data.getTotalTransactions())
-            .uniqueCards(data.getUniqueCards())
-            .fraudTransactions(data.getFraudTransactions())
-            .fraudRatePercent(data.getFraudRatePercent())
-            .cardDiversity(data.getCardDiversity())
-            .averageTransactionAmount(data.getAverageTransactionAmount())
-            //.riskLevel(data.getRiskLevel())
-            .build();
+        return MerchDataNeedsMapper.toMerchantRisk(data);
     }
-}
-
-class AnalyticsMapper {
+    
     public static Analytics toAnalytics(boolean isHighRiskHour, MerchantRisk merchantRisk) {
-        return new Analytics.Builder()
-            .highRiskHour(isHighRiskHour)
-            .merchantRisk(merchantRisk)
-            .build();
+        return AnalyticsMapper.toAnalytics(isHighRiskHour, merchantRisk);
     }
-}
-
-class FraudResponseMapper {
+    
     public static FraudResponse toFraudResponse(int prediction, String reason, String warning, Analytics analytics) {
-        return new FraudResponse.Builder()
-            .prediction(prediction)
-            .reason(reason)
-            .warning(warning)
-            .analytics(analytics)
-            .build();
+        return FraudResponseMapper.toFraudResponse(prediction, reason, warning, analytics);
     }
 }
