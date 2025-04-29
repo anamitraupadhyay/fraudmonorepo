@@ -2,6 +2,7 @@ package org.frauddetection.db;
 
 import java.sql.*;
 import org.frauddetection.model.TransactionData;
+import org.frauddetection.model.MerchDataNeeds;
 import org.json.JSONObject;
 
 public class DataBaseTestCases {
