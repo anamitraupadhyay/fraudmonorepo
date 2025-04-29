@@ -3,7 +3,7 @@ package org.frauddetection.model;
 
 //3 classes format pojo for data logic travel and json data nesting for problem solving
 //Transacion data is the final form of the json we will send to the frontend
-public class FraudResponse {
+class FraudResponse {
     private int prediction;
     private String reason;
     private String warning;
@@ -67,7 +67,7 @@ public class FraudResponse {
     }
 }
 
-public class Analytics {
+class Analytics {
     private boolean isHighRiskHour;
     private MerchantRisk merchantRisk;
 
@@ -104,7 +104,7 @@ public class Analytics {
     }
 }
 
-public class MerchantRisk {
+class MerchantRisk {
     private String merchantLocation;
     private int totalTransactions;
     private int uniqueCards;
@@ -216,7 +216,7 @@ public class MerchantRisk {
 
 //premade class for above class processing as it needs to be extracted from Transaction data since we dont need all hte 9 fields
 //on second thought i may not need this as it can be obtained from sql and...no no actually i need to store the data in class format because in here i can store all these datas and the MerchantRisk is for the json response so no data storing for the cases am gonna write
-public class MerchDataNeeds {
+class MerchDataNeeds {
     private String merchantLocation;
     private int totalTransactions;
     private int uniqueCards;

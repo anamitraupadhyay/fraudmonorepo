@@ -8,6 +8,9 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 public class ExternalServiceUtil {
 
@@ -48,7 +51,7 @@ public class ExternalServiceUtil {
              .POST(HttpRequest.BodyPublishers.ofString(data.toString()))
              .build();
              HttpClient client = HttpClient.newHttpClient();
-             client.sendAsync(request, HttpResponse.Bodyhandler.discarding());
+             client.sendAsync(request, HttpResponse.BodyHandlers.discarding());
              //this is a fire and forget request, no need to wait for response
              //if you want to wait for response, use send() method instead of sendAsync()
              //and handle the response accordingly

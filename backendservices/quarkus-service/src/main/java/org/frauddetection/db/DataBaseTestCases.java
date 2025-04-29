@@ -20,6 +20,11 @@ public class DataBaseTestCases {
             System.err.println("MariaDB JDBC Driver not found: " + e.getMessage());
         }
     }
+
+private static final double MERCHANT_RADIUS = 0.01; // ~1km radius
+private static final double HIGH_RISK_THRESHOLD = 5.0;
+private static final double MEDIUM_RISK_THRESHOLD = 1.0;
+
     // its the all info collected from db to analyze the merchant analytics servlet
         public static JSONObject getHighRiskHour(long unixTime) {
         Connection conn = null;
