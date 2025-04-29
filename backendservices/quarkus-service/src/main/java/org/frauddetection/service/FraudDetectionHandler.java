@@ -118,3 +118,4 @@ public class FraudDetectionHandler {
         return responseJson;
     }
 }
+}
