@@ -1,6 +1,5 @@
 package org.frauddetection.model;
-//premade class for above class processing as it needs to be extracted from Transaction data since we dont need all hte 9 fields
-//on second thought i may not need this as it can be obtained from sql and...no no actually i need to store the data in class format because in here i can store all these datas and the MerchantRisk is for the json response so no data storing for the cases am gonna write
+
 public class MerchDataNeeds {
     private String merchantLocation;
     private int totalTransactions;
@@ -11,7 +10,7 @@ public class MerchDataNeeds {
     private double averageTransactionAmount;
     private String riskLevel;
 
-    // Constructors
+    
     public MerchDataNeeds() {}
 
     public MerchDataNeeds(String merchantLocation, int totalTransactions, int uniqueCards, int fraudTransactions,
@@ -26,7 +25,7 @@ public class MerchDataNeeds {
         this.riskLevel = riskLevel;
     }
 
-    // Getters and Setters
+
     public String getMerchantLocation() {
         return merchantLocation;
     }

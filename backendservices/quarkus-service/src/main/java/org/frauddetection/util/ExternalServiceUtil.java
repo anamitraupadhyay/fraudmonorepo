@@ -24,12 +24,12 @@ public class ExternalServiceUtil {
         conn.setRequestProperty("Content-Type", "application/json");
         conn.setDoOutput(true);
 
-        // Send JSON body
+        
         try (OutputStream os = conn.getOutputStream()) {
             os.write(requestData.toString().getBytes());
         }
 
-        // Read response
+        
         StringBuilder responseBuilder = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
             String line;
@@ -43,18 +43,13 @@ public class ExternalServiceUtil {
     }
     public static void callKtorDataAnonymizationMicroservice(JSONObject data) throws IOException {
      System.out.println("Calling go data anonymization microservce with no payload:" +data.toString());
-     URI uriobj = URI.create("http://.../anonymize"); //no need to use .toURL() here as newBuilder works with only URI
+     URI uriobj = URI.create("http://.../anonymize");
      HttpRequest request = HttpRequest.newBuilder()
              .uri(uriobj)
              .header("Content-Type", "application/json")
-             //.setDoOutput(false) nope wont work, its of HttpURLConnection not Http
              .POST(HttpRequest.BodyPublishers.ofString(data.toString()))
              .build();
              HttpClient client = HttpClient.newHttpClient();
              client.sendAsync(request, HttpResponse.BodyHandlers.discarding());
-             //this is a fire and forget request, no need to wait for response
-             //if you want to wait for response, use send() method instead of sendAsync()
-             //and handle the response accordingly
-             //also return type is void of the method no need to return anything, also If you're doing payload retrieval, then ofString() or ofByteArray() is required — and it’s already concise.
     }
 }

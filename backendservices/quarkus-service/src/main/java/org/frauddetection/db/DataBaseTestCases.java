@@ -6,14 +6,14 @@ import org.frauddetection.model.MerchDataNeeds;
 import org.json.JSONObject;
 
 public class DataBaseTestCases {
-    // DB configuration - update port to match docker-compose
+    
     public static final String DB_URL = "jdbc:mariadb://mariadb:3306/fraud_detection?" +
                                       "allowPublicKeyRetrieval=true&useSSL=false&" +
                                       "connectTimeout=30000&socketTimeout=30000";
     public static final String DB_USER = "fraud_user";
     public static final String DB_PASSWORD = "fraud_pass";
 
-    // Load MariaDB JDBC Driver as static block so that during class loading it gets loaded by the class loader
+    
     static {
         try {
             Class.forName("org.mariadb.jdbc.Driver");
@@ -26,7 +26,7 @@ private static final double MERCHANT_RADIUS = 0.01; // ~1km radius
 private static final double HIGH_RISK_THRESHOLD = 5.0;
 private static final double MEDIUM_RISK_THRESHOLD = 1.0;
 
-    // its the all info collected from db to analyze the merchant analytics servlet
+    
         public static JSONObject getHighRiskHour(long unixTime) {
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -91,11 +91,11 @@ private static final double MEDIUM_RISK_THRESHOLD = 1.0;
                 int fraudCount = rs.getInt("fraud_transactions");
                 double avgAmount = rs.getDouble("avg_transac_amt");
                 
-                // Calculate metrics
+                
                 double fraudRate = totalTxns > 0 ? (fraudCount * 100.0 / totalTxns) : 0;
                 double cardDiversity = totalTxns > 0 ? ((double)uniqueCards / totalTxns) : 0;
                 
-                // Determine risk level
+                
                 String riskLevel = "low";
                 if (fraudRate > HIGH_RISK_THRESHOLD) {
                     riskLevel = "high";
@@ -103,7 +103,7 @@ private static final double MEDIUM_RISK_THRESHOLD = 1.0;
                     riskLevel = "medium";
                 }
                 
-                // Set values
+                
                 dataNeeds.setMerchantLocation(String.format("%.6f, %.6f", merchLat, merchLong));
                 dataNeeds.setTotalTransactions(totalTxns);
                 dataNeeds.setUniqueCards(uniqueCards);
@@ -124,12 +124,12 @@ private static final double MEDIUM_RISK_THRESHOLD = 1.0;
         }
     }
     
-    // Helper method to get connection
+    
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
     }
     
-    // Helper method to close resources
+    
     private static void closeResources(ResultSet rs, Statement stmt, Connection conn) {
         try {
             if (rs != null) rs.close();
@@ -141,7 +141,7 @@ private static final double MEDIUM_RISK_THRESHOLD = 1.0;
             if (conn != null) conn.close();
         } catch (SQLException e) {}
     }
-    // Get the last transaction for a given credit card number
+    
     public static JSONObject getLastTransaction(long ccNum) {
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -185,7 +185,7 @@ private static final double MEDIUM_RISK_THRESHOLD = 1.0;
         return null;
     }
 
-    // Store the transaction into the database
+    
     public static boolean storeTransaction(TransactionData data) {
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -222,7 +222,7 @@ private static final double MEDIUM_RISK_THRESHOLD = 1.0;
         }
     }
 
-    // Log fraudulent transactions into the fraud_logs table
+    
     public static boolean logFraud(long ccNum, String reason, JSONObject transactionData) {
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -252,64 +252,3 @@ private static final double MEDIUM_RISK_THRESHOLD = 1.0;
         }
     }
 }
-
-    /* Done by docker automatically so redundant
-    Initialize the database (create database and tables if not exist)
-    public static boolean initDatabase() {
-        Connection conn = null;
-        Statement stmt = null;
-        try {
-            // Connect to MySQL without specifying a database
-            conn = DriverManager.getConnection(DB_URL+"?useSSL=false", DB_USER, DB_PASSWORD);
-            stmt = conn.createStatement();
-            // Create database if it doesn’t exist
-            stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS fraud_detection");
-            // Switch to the database
-            stmt.executeUpdate("USE fraud_detection");
-
-            // Create transactions table
-            String createTransactions = "CREATE TABLE IF NOT EXISTS transactions ("
-                    + "id INT AUTO_INCREMENT PRIMARY KEY,"
-                    + "cc_num BIGINT NOT NULL,"
-                    + "amt DECIMAL(10,2) NOT NULL,"
-                    + "zip VARCHAR(10),"
-                    + "lat FLOAT NOT NULL,"
-                    + "`long` FLOAT NOT NULL,"
-                    + "city_pop INT NOT NULL,"
-                    + "unix_time BIGINT NOT NULL,"
-                    + "merch_lat FLOAT NOT NULL,"
-                    + "merch_long FLOAT NOT NULL,"
-                    + "INDEX idx_cc_num (cc_num),"
-                    + "INDEX idx_unix_time (unix_time)"
-                    + ")";
-            stmt.executeUpdate(createTransactions);
-
-            // Create fraud_logs table
-            String createFraudLogs = "CREATE TABLE IF NOT EXISTS fraud_logs ("
-                    + "id INT AUTO_INCREMENT PRIMARY KEY,"
-                    + "cc_num BIGINT NOT NULL,"
-                    + "reason TEXT NOT NULL,"
-                    + "detected_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
-                    + "transaction_data JSON,"
-                    + "INDEX idx_cc_num (cc_num)"
-                    + ")";
-            stmt.executeUpdate(createFraudLogs);
-            System.out.println("Database initialized successfully");
-            return true;
-        } catch (SQLException e) {
-            System.out.println("Database initialization error: " + e.getMessage());
-            return false;
-        } finally {
-            try {
-                if (stmt != null)
-                    stmt.close();
-            } catch (SQLException ex) {
-            }
-            try {
-                if (conn != null)
-                    conn.close();
-            } catch (SQLException ex) {
-            }
-        }
-    }*/
-

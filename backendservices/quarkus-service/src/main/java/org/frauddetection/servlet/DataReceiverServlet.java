@@ -20,7 +20,7 @@ public class DataReceiverServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Read JSON data
+        
         StringBuilder jsonPayload = new StringBuilder();
         try (BufferedReader reader = request.getReader()) {
             String line;
@@ -30,10 +30,10 @@ public class DataReceiverServlet extends HttpServlet {
         }
 
         try {
-            // Parse to JSONObject
+            
             JSONObject requestJson = new JSONObject(jsonPayload.toString());
             
-            // Convert to TransactionData manually
+            
             TransactionData transactionData = new TransactionData(
                 requestJson.getLong("cc_num"),
                 requestJson.getDouble("amt"),
@@ -46,28 +46,23 @@ public class DataReceiverServlet extends HttpServlet {
                 requestJson.getDouble("merch_long")
             );
             
-            // Process using handler with TransactionData
             FraudDetectionHandler handler = new FraudDetectionHandler();
             JSONObject result = handler.processTransaction(transactionData);
 
-            // Now making the request as setAttribute and making it available to merchantanalyticservlet for access
-            // Need to setAttribute the jsonpayload as its been from the buffer before sending
-            // and also the transactionData object as we need to access it in the merchant analytic servlet 
+            
             request.setAttribute("requestJson",requestJson);
             request.setAttribute("transactionData",transactionData);
             request.setAttribute("result", result);
-            // Now we can use the request object to forward the data to the merchant analytic servlet
+            
 
-            //cached and attached for analytic servlet and also we can forward objects using requestdispatcher  
-            // Discarded the failsafe analogy where we are developing this analytics as if all testcases passed then we will be needing another set merchant based data for better decision making now its all attached even if ml and distance testcases failed
+            
             RequestDispatcher dispatcherobj = request.getRequestDispatcher("/merchant-analytics");
             dispatcherobj.forward(request, response);
             
-            // Send result back
+            
             response.setContentType("application/json");
-            response.getWriter().write(result.toString()); //result.toString() is the final json object we are sending to the frontend
+            response.getWriter().write(result.toString());
         } catch (Exception e) {
-            // Error handling
             response.setContentType("application/json");
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             

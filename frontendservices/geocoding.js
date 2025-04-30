@@ -1,32 +1,34 @@
-// Geocoding API key (replace with your own key)
-const API_KEY = '070599de3b634054b32f7d632a8f8220';
 
-// Function to get coordinates from location name
+const API_KEY = 'YOUR_OPENCAGE_API_KEY';
+
+const GOOGLE_MAPS_API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY';
+
 export async function getCoordinates(location) {
-    const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${API_KEY}`);
+    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(location)}&key=${GOOGLE_MAPS_API_KEY}`);
     const data = await response.json();
 
     if (data.results.length > 0) {
-        const { lat, lng } = data.results[0].geometry;
+        const { lat, lng } = data.results[0].geometry.location;
         return { lat, lng };
     } else {
         return null;
     }
 }
 
-// Function to get city population from location name
+
+
 export async function getCityPopulation(location) {
     const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${API_KEY}`);
     const data = await response.json();
     
     if (data.results.length > 0) {
         const category = data.results[0].components._category;
-        // Simple population estimation based on location category
+        
         if (category === 'place' || category === 'city') {
             const importance = parseFloat(data.results[0].importance || 0.5);
-            return Math.round(importance * 1000000); // Rough estimate based on location importance
+            return Math.round(importance * 1000000);
         }
-        return 10000; // Default small city population
+        return 10000;
     }
     return 0;
 }

@@ -1,18 +1,15 @@
 package org.frauddetection.model;
 
-
-//3 classes format pojo for data logic travel and json data nesting for problem solving
-//Transacion data is the final form of the json we will send to the frontend
 public class FraudResponse {
     private int prediction;
     private String reason;
     private String warning;
     private Analytics analytics;
 
-    // Private constructor
+    
     private FraudResponse() {}
 
-    // Builder Class
+    
     public static class Builder {
         private int prediction;
         private String reason;
@@ -49,7 +46,7 @@ public class FraudResponse {
         }
     }
 
-    // Getters
+    
     public int getPrediction() {
         return prediction;
     }

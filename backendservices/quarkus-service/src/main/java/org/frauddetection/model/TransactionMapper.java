@@ -1,7 +1,7 @@
 package org.frauddetection.model;
 
 public class TransactionMapper {
-    // Public facade methods that delegate to the individual mappers
+    
     public static MerchantRisk toMerchantRisk(MerchDataNeeds data) {
         return MerchDataNeedsMapper.toMerchantRisk(data);
     }
