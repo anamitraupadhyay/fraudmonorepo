@@ -37,7 +37,7 @@ def predict():
 
         return jsonify({
             "prediction": int(prediction),
-            #"reason": "ML model detected potential fraud" if prediction == 1 else "Transaction looks safe."
+            "reason": "ML model detected potential fraud" if prediction == 1 else "Transaction looks safe."
         })
 
     except Exception as e:

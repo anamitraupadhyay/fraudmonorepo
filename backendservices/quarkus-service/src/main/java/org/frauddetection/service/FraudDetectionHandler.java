@@ -13,7 +13,6 @@ import org.frauddetection.util.ExternalServiceUtil;
 
 @ApplicationScoped
 public class FraudDetectionHandler {
-    // Single speed threshold (300 km/h - high-speed train)
     private static final double MAX_SPEED_KMH = 300.0;
 
     @Inject
@@ -34,27 +33,17 @@ public class FraudDetectionHandler {
     }
 
     public JSONObject processTransaction(TransactionData transactionData) throws IOException {
-        // Extract transaction fields for test cases
         long ccNum = transactionData.getCcNum();
         double lat = transactionData.getLat();
         double lon = transactionData.getLon();
         long unixTime = transactionData.getUnixTime();
-        
-        // Prepare response
-        JSONObject responseJson = new JSONObject();
 
-        // Convert transaction data to JSON for logging
+        JSONObject responseJson = new JSONObject();
         JSONObject requestData = convertToJson(transactionData);
-        
-        // Get last transaction (if any)
         JSONObject lastTransaction = DataBaseTestCases.getLastTransaction(ccNum);
-        
-        // Simple decision flow: new user -> ML model, existing user → speed check, for later existing users-> ML model if under speed threshold...ohkay done this too
+
         if (lastTransaction == null) {
-            // New user - use ML model
             responseJson = ExternalServiceUtil.callPythonModel(requestData);
-            
-            // Log if ML model predicts fraud
             if (responseJson.getInt("prediction") == 1) {
                 DataBaseTestCases.logFraud(
                     ccNum,
@@ -62,44 +51,32 @@ public class FraudDetectionHandler {
                     requestData
                 );
             }
-        }
-        else {
-            // Existing user - check speed between transactions
+        } else {
             long lastUnixTime = lastTransaction.getLong("unix_time");
-            
-            // Skip impossible time differences
+
             if (unixTime <= lastUnixTime) {
                 responseJson.put("prediction", 0);
                 responseJson.put("reason", "Transaction timestamp valid");
-            } 
-            else {
-                // Calculate travel metrics
+            } else {
                 double lastLat = lastTransaction.getDouble("lat");
                 double lastLon = lastTransaction.getDouble("long");
                 double distanceKm = FraudDetectionUtils.haversine(lastLat, lastLon, lat, lon);
-                
-                // Only check speed if distance is significant (>500km)
+
                 if (distanceKm > 500.0) {
                     double timeDiffHours = (unixTime - lastUnixTime) / 3600.0;
                     double speedKmh = distanceKm / timeDiffHours;
-                    
-                    // Simple speed check - only rule we care about
+
                     if (speedKmh > MAX_SPEED_KMH) {
                         String reason = String.format("Impossible travel speed: %.2f km/h", speedKmh);
                         responseJson.put("prediction", 1);
                         responseJson.put("reason", reason);
                         DataBaseTestCases.logFraud(ccNum, reason, requestData);
-                    } 
-                    else {
+                    } else {
                         responseJson.put("prediction", 0);
                         responseJson.put("reason", "Transaction speed normal");
                     }
-                } 
-                else {
-                    // Distance too small to calculate meaningful speed
+                } else {
                     responseJson = ExternalServiceUtil.callPythonModel(requestData);
-            
-                    // Log if ML model predicts fraud
                     if (responseJson.getInt("prediction") == 1) {
                         DataBaseTestCases.logFraud(
                             ccNum,
@@ -110,8 +87,7 @@ public class FraudDetectionHandler {
                 }
             }
         }
-        
-        // Always store the transaction
+
         DataBaseTestCases.storeTransaction(transactionData);
         return responseJson;
     }

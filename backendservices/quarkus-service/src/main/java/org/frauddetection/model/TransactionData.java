@@ -1,11 +1,5 @@
 package org.frauddetection.model;
 
-/**
- * Data model to hold form field values where in constructor it gets and in the functions it sets by returning
- * Why default constructor needed for jsonb?
- * this is the main class structure to store the json formatted data into object format data for jakarta and java bsed test cases
- * setters in constructor as well as in functions and getter functions for accessing data for operations
- */
 
 public class TransactionData {
     private long ccNum;
@@ -31,7 +25,7 @@ public class TransactionData {
         this.merchLon = merchLon;
     }
 
-    // Getters (setters omitted as there is no need to manipulate these data)
+    
     public long getCcNum() {
         return ccNum;
     }
