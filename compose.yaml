@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   mariadb:
     image: mariadb:latest
@@ -8,22 +10,20 @@ services:
       MYSQL_USER: fraud_user
       MYSQL_PASSWORD: fraud_pass
     ports:
-      - "3306:3306"  # Changed from 3307:3306
+      - "3306:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
       - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     networks:
       - fraud-network
-    command: 
+    command:
       - --default-authentication-plugin=mysql_native_password
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
     restart: always
 
   quarkus-service:
-    build:
-      context: ./backendservices/quarkus-service
-      dockerfile: Dockerfile
+    image: anamitra04/fraudmonorepo-quarkus-service:latest
     container_name: quarkus-service
     environment:
       - JAVA_OPTS=-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager
@@ -40,8 +40,7 @@ services:
     restart: always
 
   python-quarkus-service:
-    build:
-      context: ./backendservices/python-quarkus-service
+    image: anamitra04/fraudmonorepo-python-quarkus-service:latest
     container_name: python-quarkus-service
     ports:
       - "5005:5000"
@@ -50,8 +49,7 @@ services:
     restart: always
 
   frontend:
-    build:
-      context: ./frontendservices
+    image: anamitra04/fraudmonorepo-frontend:latest
     container_name: fraud-frontend
     ports:
       - "3000:3000"
@@ -64,4 +62,3 @@ networks:
 
 volumes:
   mariadb_data:
-

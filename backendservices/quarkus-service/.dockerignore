@@ -1,7 +1,0 @@
-# Only exclude unnecessary files
-.git/
-.idea/
-.vscode/
-*.iml
-target/*
-!target/quarkus-app/
